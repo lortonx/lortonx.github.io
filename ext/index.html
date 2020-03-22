@@ -7,7 +7,13 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 		<title>Delta v4</title>
 
-		<base href="http://127.0.0.1:5500/deltav4.com/">
+		<script>
+			if(location.href.indexOf('dev')>-1){
+				document.write('<base href="http://127.0.0.1:5500/deltav4.com/ext/">')
+			}else{
+				document.write('<base href="https://lortonx.github.io/ext/">')
+			}
+		</script>
 
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:700">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
