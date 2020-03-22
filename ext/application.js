@@ -38,6 +38,7 @@ var profiles = {
         //this.slaveProfile = this.profiles[this.selectedB]
     },
     setSkinPreview(num){
+        if(num==-1)return;
         var img = new Image()
         img.onerror = function(){this.style.display='none'}
         img.crossOrigin = 'anonymous'
@@ -51,10 +52,10 @@ var profiles = {
         img.src = this.profiles[num].skinURL
         $('#profiles .thumb:nth('+num+')').html(img)
     },
-    addProfile(num){
+    renderProfile(num){
         var thumb = document.createElement('div')
-        thumb.id='profile-'+num
-        thumb.setAttribute('data-profile',num)
+        //thumb.id='profile-'+num
+        //thumb.setAttribute('data-profile',num)
         if(this.profiles[num].skinURL){
             var img = new Image()
             img.onerror = function(){this.style.display='none'}
@@ -64,12 +65,32 @@ var profiles = {
         }
 
         //thumb.innerHTML = this.profiles[num].skinURL?`<img src="${this.profiles[num].skinURL}">`:''
-        thumb.className = 'thumb'
-        document.getElementById('skins2').appendChild(thumb)
+        thumb.className = 'thumb' 
+        document.getElementById('thumbs').appendChild(thumb)
         this.setPosition()
     },
     remProfile(num){
+        if(this.profiles.length<3) return;
+ 
+        //this.profiles.pop()
+        this.profiles.splice(num,1)
+        this.thumbs.children[num].remove()
+        this.selectProfile(true,this.selectedA)
+        this.selectProfile(false,this.selectedB)
         this.setPosition()
+        this.saveSettings()
+    },
+    addProfile(num){
+        var index = this.profiles.push({
+            nick: `Profile #`+this.profiles.length,
+            clanTag: '',
+            skinURL: '',
+            color: '#ffffff'
+        })
+        console.log('added',index)
+        this.renderProfile(index-1)
+
+        this.saveSettings()
     },
     setPosition(){
         Math.rad = function (degrees) {
@@ -108,17 +129,23 @@ var profiles = {
         }
     },
     selectProfile(isMain,num){
+        console.log(this.profiles.length,num)
+        if(num > this.profiles.length-1) num--
         if(isMain){
-            $('#profile-'+this.selectedA).removeClass('selectedA')
-            $('#profile-'+num).addClass('selectedA')
+            //$('#profile-'+this.selectedA).removeClass('selectedA')
+            //$('#profile-'+num).addClass('selectedA')
+            $(this.thumbs.children[this.selectedA]).removeClass('selectedA')
+            $(this.thumbs.children[num]).addClass('selectedA')
             this.selectedA = num
             Settings.saveSettings(this.selectedA, `ogarioSelectedProfile`);
             this.setSkinPreview(num)
             this.setValues(num)
             //this.mainProfile = this.profiles[this.selectedA]
         }else{
-            $('#profile-'+this.selectedB).removeClass('selectedB')
-            $('#profile-'+num).addClass('selectedB')
+            //$('#profile-'+this.selectedB).removeClass('selectedB')
+            //$('#profile-'+num).addClass('selectedB')
+            $(this.thumbs.children[this.selectedB]).removeClass('selectedB')
+            $(this.thumbs.children[num]).addClass('selectedB')
             this.selectedB = num
             Settings.saveSettings(this.selectedB, `ogarioSelectedProfileB`);
             //this.slaveProfile = this.profiles[this.selectedB]
@@ -129,6 +156,7 @@ var profiles = {
         Settings.saveSettings(this.profiles, `ogarioPlayerProfiles`);
     },
     setValues(num) {
+        if(num==-1)return;
         this.$nick.val(this.profiles[num].nick);
         this.$clantag.val(this.profiles[num].clanTag);
         this.$skin.val(this.profiles[num].skinURL);
@@ -147,6 +175,24 @@ var profiles = {
         this.$skin = $(`#skin`)
         this.$color = $(`#color`)
         this.$preview = $('#skin-preview2')
+        this.thumbs = document.getElementById('thumbs')
+
+        $( "#profiles #rem" )
+        .mouseenter(() => {
+            var lastProfile = this.profiles.length
+            $(this.thumbs.children[this.selectedB]).addClass('selectedX')
+        })
+        .mouseleave(() => {
+            var lastProfile = this.profiles.length
+            $(this.thumbs.children[this.selectedB]).removeClass('selectedX')
+
+        });
+        $('#profiles #add').click(()=>{this.addProfile()})
+        $('#profiles #rem').click(()=>{
+            var lastProfile = this.selectedB//this.profiles.length
+            this.remProfile(lastProfile)
+            $('#profiles #rem').trigger('mouseenter')
+        })
 
         this.load()
         this.mainProfile = this.slaveProfile = {
@@ -156,7 +202,7 @@ var profiles = {
             color: theme.mainColor||'#ffffff'
         }
         this.profiles.forEach((profile,n)=>{
-            this.addProfile.bind(this)(n)
+            this.renderProfile.bind(this)(n)
         })
         this.selectProfile(true,this.selectedA)
         this.selectProfile(false,this.selectedB)
@@ -166,15 +212,22 @@ var profiles = {
             self.setSkinPreview.bind(self)(self.selectedA)
             self.setSkinProfile.bind(self)(self.selectedA)
         })
-        $(document).on('contextmenu', '#skins2 .thumb',function(event){
+        $(document).on('contextmenu', '#thumbs .thumb',function(event){
             event.preventDefault();
-            var n  = this.getAttribute('data-profile')
+            //var n  = this.getAttribute('data-profile')
+            var nodes = Array.prototype.slice.call( self.thumbs.children )
+            var n = nodes.indexOf(this)
             self.selectProfile(false,Number(n))
         })
-        $(document).on('click', '#skins2 .thumb',function(event){
+        $(document).on('click', '#thumbs .thumb',function(event){
             event.preventDefault();
+            
             self.getValues(self.selectedA)
-            var n  = this.getAttribute('data-profile')
+
+            //var n  = this.getAttribute('data-profile')
+            var nodes = Array.prototype.slice.call( self.thumbs.children )
+            var n = nodes.indexOf(this)
+            //console.log(nodes,n,this)
             self.selectProfile(true,Number(n))
         })
 
@@ -578,7 +631,7 @@ var GlAccount = {
             this.user.id = basicProfile.getId()
             this.emit('user')
             this.emit('login')
-            console.log('readUserGL', this.user)
+            //console.log('readUserGL', this.user)
         }
 
     },
@@ -634,7 +687,7 @@ var FbAccount = {
                 this.user.last_name = data.last_name
                 this.user.id = data.id
                 this.emit('user')
-                console.log('readUserFB', this.user)
+                //console.log('readUserFB', this.user)
             });
         }
     },

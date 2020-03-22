@@ -526,7 +526,6 @@ height:200px;
 vertical-align:bottom;
 text-align:center;
 background:var(--color-active);
--border:0.5px solid;
 width:40px;height:40px;
 border-radius:50%;
 top: 50%;left: 50%;
@@ -553,16 +552,31 @@ overflow:hidden;
     right:0;
     line-height: 40px;
     width:inherit;
-color: var(--color-active-text);
-text-shadow: 0 0 1px orange;
+	color: var(--color-active-text);
+	text-shadow: 0 0 1px orange;
   }
+
+.thumb.selectedX:after {
+    content: 'X';
+    background: rgba(148, 26, 26, 0.55);
+    position: absolute;
+    top: 0;
+    right: 0;
+    line-height: 40px;
+    width: inherit;
+    color: var(--color-active-text);
+	text-shadow: 0 0 1px orange;
+}
+
 .selectedA{
     box-shadow: 0 0 0 1px rgb(0, 199, 202);
 }
 .selectedB{
     box-shadow: 0 0 0 1px orange;
 }
-
+.selectedX{
+    box-shadow: 0 0 0 1px red;
+}
 
 .thumb:hover{
 z-index:300 !important;
@@ -570,6 +584,29 @@ box-shadow: 0 0 0 1px red;
 }
 
 img{height:100%;width:100%}
+
+
+.skin-button {
+    background: var(--color-active);
+    width: 30px;
+    height: 15px;
+    line-height: normal;
+    border-radius: 10px;
+    bottom: -12%;
+    left: 40%;
+    z-index: 198;
+    position: absolute;
+    text-align: center;
+    transform: translate(-50%, -50%);
+}
+
+.skin-button#add{
+	left: 40%;
+}
+
+.skin-button#rem{
+	left: 60%;
+}
 
 /*SCROLLBAR*/
 .os-host-transition>.os-scrollbar, .os-host-transition>.os-scrollbar-corner {

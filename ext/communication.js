@@ -120,40 +120,6 @@ function minimapCell(id, name, skinID, skinUrl) {
 }
 
 
-/*const emojiChar = {
-    ':)': `smile.svg`,
-    ';)': `wink.svg`,
-    '=)': 'smirk.svg',
-    ':D': `grin.svg`,
-    'X-D': `xgrin.svg`,
-    '=D': `joy.svg`,
-    ':(': 'sad.svg',
-    ';(': `cry.svg`,
-    ':P': `tongue.svg`,
-    ';P': 'tonguew.svg',
-    ':*': 'kiss.svg',
-    '$)': 'smileh.svg',
-    '<3': `heart.svg`,
-    '8=)': 'cool.svg',
-    ':o': `astonished.svg`,
-    '(:|': `sweat.svg`,
-    ':|': `neutral.svg`,
-    ':': 'unamused.svg',
-    ':@': 'pouting.svg',
-    '|-)': 'sleep.svg',
-    '^_^': 'relaxed.svg',
-    '-_-': `expressionless.svg`,
-    '$_$': `money.svg`,
-    'O:)': `angel.svg`,
-    '3:)': `devil.svg`,
-    '(poop)': `poo.svg`,
-    '(fuck)': 'finger.svg',
-    '(clap)': `clap.svg`,
-    '(ok)': `ok.svg`,
-    '(victory)': 'victory.svg',
-    '(y)': 'thumb.svg',
-    '(n)': `thumbd.svg`
-};*/
 
 const emojiChar = {
     ':)': `1f642.svg`,
@@ -1477,7 +1443,6 @@ var comm = {
         for (const emoji in emojiChar) {
             if (emojiChar.hasOwnProperty(emoji)) {
                 $('#chat-emoticons').append(`<img src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/svg/${emojiChar[emoji]}" alt="${emoji}" class="emoticon">`);
-                //$('#chat-emoticons').append(`<img src="https://legendmod.ml/banners/emoticons/${emojiChar[emoji]}" alt="${emoji}" class="emoticon">`);
             }
         }
 

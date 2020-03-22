@@ -168,11 +168,11 @@ function Cell(id, x, y, size, color, isFood, isVirus, isPlayer, shortMass, virus
         return true;
     };
     this.setScale = function(scale, nickScale, massScale, virusScale, strokeScale) {
-        const ceilScale = Math.ceil(scale * 3) / 3; //10
+        const ceilScale = Math.ceil(scale * 4) / 4; //10
         this.rescale = false;
         if (this.scale != ceilScale) {
             //patch 1
-            if(ceilScale > 0.5) return;
+            if(ceilScale > 0.9) return;
             this.scale = ceilScale;
             this.rescale = true;
         }
