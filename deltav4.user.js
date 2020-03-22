@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Delta v4
-// @version      5.2
+// @version      5.1
 // @description  9999999 in 1
 // @namespace    delta.agar
 // @author       neo
@@ -13,6 +13,7 @@
 // @connect		 www.agartool.io
 // @connect		 imasters.org.ru
 // @connect      legendmod.ml
+// @connect      lortonx.github.io
 // @connect      127.0.0.1
 // @connect		 ogar.ovh
 // @grant        GM.xmlHttpRequest
@@ -27,10 +28,19 @@ if (location.host == 'agar.io' && location.pathname === '/' ) {
   var url;
   switch(mode){
       case 'github':
-          url = 'https://deltav4.glitch.me/generatum.html'
+          url = 'https://lortonx.github.io/ext/index.html?'+Math.random()
           break;
       case 'dev2': url = 'http://127.0.0.1:5500/deltav4.com/ext/index.html'
           break;
+      case 'v4':
+          url = 'https://lortonx.github.io/v4/index.html?'+Math.random()
+          break;
+      case 'dev-v4': url = 'http://127.0.0.1:5500/deltav4.com/v4/index.html'
+          break;
+  
+  
+  
+
       case 'ogario':
           url = 'https://cdn.ogario.ovh/v4/beta/'
           break;
