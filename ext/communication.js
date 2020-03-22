@@ -808,7 +808,6 @@ var comm = {
         return false;
     },
     parseMessage(string) {
-        console.log(1,string)
         const isImage = /\[img\]([\w\:\/\.\?]+)\[\/img\]/i;
         if (isImage.test(string)) {
             var url = string.match(isImage)[1];
@@ -817,7 +816,6 @@ var comm = {
             }
             return '';
         }
-        console.log(2,string)
         const isVideo = /\[yt\]([\w-]{11})\[\/yt\]/i;
         if (isVideo.test(string)) {
             if (settings.showChatVideos) {
@@ -826,19 +824,17 @@ var comm = {
             }
             return '';
         }
-        console.log(3,string)
         let escapedHtml = this.escapeHTML(string);
         if (settings.chatEmoticons) {
-            console.log(4,escapedHtml)
+
             escapedHtml = this.parseEmoticons(escapedHtml);
-            console.log(5,escapedHtml)
+
         }
-        console.log(6,escapedHtml)
         return escapedHtml;
     },
     parseEmoticons(string) {
         return String(string).replace(/\&lt\;3/g, '<3').replace(/(O\:\)|3\:\)|8\=\)|\:\)|\;\)|\=\)|\:D|X\-D|\=D|\:\(|\;\(|\:P|\;P|\:\*|\$\)|\<3|\:o|\(\:\||\:\||\:\\|\:\@|\|\-\)|\^\_\^|\-\_\-|\$\_\$|\(poop\)|\(fuck\)|\(clap\)|\(ok\)|\(victory\)|\(y\)|\(n\)|\(angry\)|\(clown\)|\(crazy\)|\(devil\)|\(devil2\)|\(fb\)|\(google\)|\(ghost\)|\(heel\)|\(kiss\)|\(lipstick\)|\(rage\)|\(teacher\)|\(together\)|\(toothy\)|\(evil\)|\(baby\)|\(wow\))/g, function(t) {
-            return '<img src=\"https://legendmod.ml/banners/emoticons/' + emojiChar[t] + '\" alt=\"' + t + '\" class=\"emoticon\">';
+            return '<img src=\"https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/svg/' + emojiChar[t] + '\" alt=\"' + t + '\" class=\"emoticon\">';
         });
     },
     displayChatMessage(time, type, id, nick) {
