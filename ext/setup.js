@@ -1847,7 +1847,8 @@ var settings = {
     showExtraMiniMapGuides:true,
 };
 var tempsett = {
-    
+    showCustomSkins: true,
+    pause:false,
 }
 
 let chatCommand = {

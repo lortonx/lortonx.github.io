@@ -611,7 +611,6 @@ Client.prototype = {
     pause: false,
     targeting: false,
     removePlayerCell: false,
-    showCustomSkins: true,
     showFood: true,
     foodIsHidden: false,
     selectBiggestCell: true,
@@ -1297,13 +1296,13 @@ Client.prototype = {
                     return text;
                 };
                 var message = new buffer.Buffer(view.buffer)
-                this.viewMinX = message.readDoubleLE(offset);
+                this.viewMinX = this.flipX(message.readDoubleLE(offset));
                 offset += 8;
-                this.viewMinY = message.readDoubleLE(offset);
+                this.viewMinY = this.flipY(message.readDoubleLE(offset));
                 offset += 8;
-                this.viewMaxX = message.readDoubleLE(offset);
+                this.viewMaxX = this.flipX(message.readDoubleLE(offset));
                 offset += 8;
-                this.viewMaxY = message.readDoubleLE(offset);
+                this.viewMaxY = this.flipY(message.readDoubleLE(offset));
                 offset += 8
                 offset += 4
                 if(encode2()) {
