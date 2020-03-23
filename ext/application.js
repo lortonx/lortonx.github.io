@@ -129,7 +129,6 @@ var profiles = {
         }
     },
     selectProfile(isMain,num){
-        console.log(this.profiles.length,num)
         if(num > this.profiles.length-1) num--
         if(isMain){
             //$('#profile-'+this.selectedA).removeClass('selectedA')
