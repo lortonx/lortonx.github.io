@@ -1470,9 +1470,9 @@ var comm = {
         this.setChatSoundsBtn();
         this.connect()
         const app = this;
-        setInterval(() => {
+        //setInterval(() => {
             requestAnimationFrame(app.drawMiniMap.bind(this))
-        }, 33);
+        //}, 33);
         setInterval(() => {
             app.updateTeamPlayers();
         }, this.updateInterval);

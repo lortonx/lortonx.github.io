@@ -554,7 +554,12 @@ overflow:hidden;
     width:inherit;
 	color: var(--color-active-text);
 	text-shadow: 0 0 1px orange;
-  }
+}
+
+.thumb.selectedA.selectedB:after{
+	content:'1/2';
+}
+
 
 .thumb.selectedX:after {
     content: 'X';
@@ -569,12 +574,15 @@ overflow:hidden;
 }
 
 .selectedA{
+	z-index:300 !important;
     box-shadow: 0 0 0 1px rgb(0, 199, 202);
 }
 .selectedB{
+	z-index:300 !important;
     box-shadow: 0 0 0 1px orange;
 }
 .selectedX{
+	z-index:300 !important;
     box-shadow: 0 0 0 1px red;
 }
 

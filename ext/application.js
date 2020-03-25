@@ -131,20 +131,16 @@ var profiles = {
     selectProfile(isMain,num){
         if(num > this.profiles.length-1) num--
         if(isMain){
-            //$('#profile-'+this.selectedA).removeClass('selectedA')
-            //$('#profile-'+num).addClass('selectedA')
-            $(this.thumbs.children[this.selectedA]).removeClass('selectedA')
-            $(this.thumbs.children[num]).addClass('selectedA')
+            this.thumbs.children[this.selectedA].classList.remove("selectedA");
+            this.thumbs.children[num].classList.add("selectedA");
             this.selectedA = num
             Settings.saveSettings(this.selectedA, `ogarioSelectedProfile`);
             this.setSkinPreview(num)
             this.setValues(num)
             //this.mainProfile = this.profiles[this.selectedA]
         }else{
-            //$('#profile-'+this.selectedB).removeClass('selectedB')
-            //$('#profile-'+num).addClass('selectedB')
-            $(this.thumbs.children[this.selectedB]).removeClass('selectedB')
-            $(this.thumbs.children[num]).addClass('selectedB')
+            this.thumbs.children[this.selectedB].classList.remove("selectedB");
+            this.thumbs.children[num].classList.add("selectedB");
             this.selectedB = num
             Settings.saveSettings(this.selectedB, `ogarioSelectedProfileB`);
             //this.slaveProfile = this.profiles[this.selectedB]

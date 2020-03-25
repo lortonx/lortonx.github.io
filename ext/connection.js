@@ -259,7 +259,7 @@ function Cell(id, x, y, size, color, isFood, isVirus, isPlayer, shortMass, virus
         const margin = this.margin == 0 ? ~~this.y - /*~~*/(heigth / 2) : ~~this.y + this.margin;
         if(width!=0 && heigth!=0) {
             // patch 1
-            var pr = ctx.imageSmoothingQuality
+            //var pr = ctx.imageSmoothingQuality
             //ctx.imageSmoothingQuality = "high"
             ctx.drawImage(imgTxt, ~~this.x - /*~~*/(width / 2), margin, width, heigth);
             //ctx.imageSmoothingQuality = pr
@@ -1501,7 +1501,7 @@ Client.prototype = {
     },
     calcViewport(){
         var size = 0
-        var mtp = 1.995
+        var mtp = 1.995//1.995
         if(this.playerCells.length>0){
             for (var im = 0; this.playerCells.length > im; im++) 
                 size += this.playerCells[im].size
@@ -1706,7 +1706,7 @@ Client.prototype = {
         return '#'+this.color2Hex(r)+this.color2Hex(g)+this.color2Hex(b)
     },
     sortCells() {
-        this.cells.sort((row, conf) => row.size == conf.size ? row.id - conf.id : row.size - conf.size);
+        this.cells.sort((A, B) => A.size == B.size ? A.id - B.id : A.size - B.size);
     },
     calculatePlayerMassAndPosition() {
         let size = 0;

@@ -573,12 +573,12 @@ var drawRender = {
                // if(!this.isInDisplay(food.x,food.y,0)){return;/*continue*/}
                 this.renderedObjects++
                 
-                if(settings.debug){
+                /*if(settings.debug){
                     if( food.x > Connection.camMaxX ) Connection.camMaxX = food.x
                     if( food.y > Connection.camMaxY ) Connection.camMaxY = food.y
                     if( food.x < Connection.camMinX ) Connection.camMinX = food.x
                     if( food.y < Connection.camMinY ) Connection.camMinY = food.y
-                }
+                }*/
                 ctx.moveTo(food.x, food.y);
                 if (scale < 0.16) {
                     const size = food.size + theme.foodSize;
