@@ -34,9 +34,6 @@ if (window.location.host == 'agar.io' && window.location.pathname === '/' ) {
   
   var location = 'https://deltav4.glitch.me/v4/index.html'
   var modes = {
-      "remote":function(){
-          location = 'https://deltav4.glitch.me/generator22.html'
-      },
       "v4":function(){
           location = 'https://lortonx.github.io/v4/index.html'
       },
