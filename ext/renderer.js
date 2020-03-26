@@ -544,11 +544,10 @@ var drawRender = {
         if (!food.length) {
             return;
         }
-        Connection.camMaxX = Connection.playerX
+        /*Connection.camMaxX = Connection.playerX
         Connection.camMaxY = Connection.playerY
         Connection.camMinX = Connection.playerX
-        Connection.camMinY = Connection.playerY
-
+        Connection.camMinY = Connection.playerY*/
         if (settings.optimizedFood && this.pellet) {
             /*for (var length = 0; length < food.length; length++) {
                 var x = food[length].x - 10 - theme.foodSize;
