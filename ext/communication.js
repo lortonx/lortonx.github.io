@@ -1022,6 +1022,7 @@ var comm = {
     onSpectate() {
         this.onJoin();
         this.sendPlayerJoin();
+        this.sendPlayerSpawn()
     },
     join() {
         //this.setParty();
@@ -1470,9 +1471,9 @@ var comm = {
         this.setChatSoundsBtn();
         this.connect()
         const app = this;
-        //setInterval(() => {
+        setInterval(() => {
             requestAnimationFrame(app.drawMiniMap.bind(this))
-        //}, 33);
+        }, 100);
         setInterval(() => {
             app.updateTeamPlayers();
         }, this.updateInterval);

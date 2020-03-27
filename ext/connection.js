@@ -1099,6 +1099,7 @@ Client.prototype = {
                 }
 
                 if(settings.mapLocalFix3 && this.ghostCellsStep==1 && this.ghostCells[0]) {
+                    console.log('[DELTA] ghostfix')
                     this.realQuadrant =  this.calcQuadrant(this.flipX(this.ghostCells[0].x), this.flipY(this.ghostCells[0].y))
                     this.setQuadrant(this.lastQuadrant)
                 }
@@ -1347,16 +1348,14 @@ Client.prototype = {
                 this.countPps()
                 break;
             case 64:
-                this.viewMinX = (message.readDoubleLE(offset));
+                this.viewMinX = /*this.flipX*/(message.readDoubleLE(offset));
                 offset += 8;
-                this.viewMinY = (message.readDoubleLE(offset));
+                this.viewMinY = /*this.flipY*/(message.readDoubleLE(offset));
                 offset += 8;
-                this.viewMaxX = (message.readDoubleLE(offset));
+                this.viewMaxX = /*this.flipX*/(message.readDoubleLE(offset));
                 offset += 8;
-                this.viewMaxY = (message.readDoubleLE(offset));
+                this.viewMaxY = /*this.flipY*/(message.readDoubleLE(offset));
 
-                
-                
                 this.setMapOffset(this.viewMinX, this.viewMinY, this.viewMaxX, this.viewMaxY);
                 if((~~(this.viewMaxX - this.viewMinX)) === 14142 && (~~(this.viewMaxY - this.viewMinY)) === 14142){
                     //window.user.offsetX = (this.viewMinX + this.viewMaxX) / 2
@@ -1477,27 +1476,56 @@ Client.prototype = {
         this.viruses = [];
     },
     setMapOffset(left, top, right, bottom) {
-        if (/*!this.integrity||*/(right - left) > 14000 && (bottom - top) > 14000) {
-            this.off={left:left, top:top, right:right, bottom:bottom}
+                //this.viewMinX, this.viewMinY, this.viewMaxX, this.viewMaxY
+
+        if ((right - left) > 14000 && (bottom - top) > 14000) {
+            
+            console.log('mapMinX',this.mapMinX == left)
+            console.log('mapMinY',this.mapMinY == top)
+            console.log('mapMaxX',this.mapMaxX == right)
+            console.log('mapMaxY',this.mapMaxY == bottom)
 
             this.mapOffsetX = (this.mapOffset) - right;
             this.mapOffsetY = (this.mapOffset) - bottom;
-            this.mapMinX = /*~~*/((-this.mapOffset) - this.mapOffsetX);
-            this.mapMinY = /*~~*/((-this.mapOffset) - this.mapOffsetY);
-            this.mapMaxX = /*~~*/((this.mapOffset) - this.mapOffsetX);
-            this.mapMaxY = /*~~*/((this.mapOffset) - this.mapOffsetY);
+            this.mapMinX = left//((-this.mapOffset) - this.mapOffsetX);
+            this.mapMinY = top//((-this.mapOffset) - this.mapOffsetY);
+            this.mapMaxX = right//((this.mapOffset) - this.mapOffsetX);
+            this.mapMaxY = bottom//((this.mapOffset) - this.mapOffsetY);
             this.mapMidX = (this.mapMaxX + this.mapMinX) / 2;
             this.mapMidY = (this.mapMaxY + this.mapMinY) / 2;
             if (!this.mapOffsetFixed) {
-                this.viewX = this.lviewX = (right + left) / 2;
-                this.viewY = this.lviewY = (bottom + top) / 2;
-                application.emit('offset',this)
+                this.viewX = (right + left) / 2;
+                this.viewY = (bottom + top) / 2;
+                //application.emit('offset',this)
             }
-
             this.mapOffsetFixed = true;
             //application.emit('offset',this)
             console.log(`[Client 1] Map offset fixed (x, y):`, this.mapOffsetX, this.mapOffsetY);
+        }else{
+            this.viewportMinX = left
+            this.viewportMinY = top
+            this.viewportMaxX = right
+            this.viewportMaxY = bottom
         }
+        /*if ((right - left) > 14000 && (bottom - top) > 14000) {
+
+            this.mapOffsetX = (this.mapOffset) - right;
+            this.mapOffsetY = (this.mapOffset) - bottom;
+            this.mapMinX = ((-this.mapOffset) - this.mapOffsetX);
+            this.mapMinY = ((-this.mapOffset) - this.mapOffsetY);
+            this.mapMaxX = ((this.mapOffset) - this.mapOffsetX);
+            this.mapMaxY = ((this.mapOffset) - this.mapOffsetY);
+            this.mapMidX = (this.mapMaxX + this.mapMinX) / 2;
+            this.mapMidY = (this.mapMaxY + this.mapMinY) / 2;
+            if (!this.mapOffsetFixed) {
+                this.viewX = (right + left) / 2;
+                this.viewY = (bottom + top) / 2;
+                //application.emit('offset',this)
+            }
+            this.mapOffsetFixed = true;
+            //application.emit('offset',this)
+            console.log(`[Client 1] Map offset fixed (x, y):`, this.mapOffsetX, this.mapOffsetY);
+        }*/
     },
     calcViewport(){
         var size = 0

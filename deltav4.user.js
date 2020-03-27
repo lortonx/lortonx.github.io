@@ -34,17 +34,17 @@ if (window.location.host == 'agar.io' && window.location.pathname === '/' ) {
   
   var location = 'https://deltav4.glitch.me/v4/index.html'
   var modes = {
-      "v4":function(){
-          location = 'https://lortonx.github.io/v4/index.html'
-      },
       "v4dev":function(){
           location = 'http://127.0.0.1:5500/deltav4.com/v4/index.html'
       },
-      "v5":function(){
-          location = 'https://lortonx.github.io/ext/index.html'
+      "v4":function(){
+          location = 'https://lortonx.github.io/v4/index.html'
       },
       "v5dev":function(){
           location = 'http://127.0.0.1:5500/deltav4.com/ext/index.html'
+      },
+      "v5":function(){
+          location = 'https://lortonx.github.io/ext/index.html'
       },
       "ogario":function(){
           location = 'https://cdn.ogario.ovh/v4/beta/'
@@ -121,9 +121,13 @@ if (window.location.host == 'agar.io' && window.location.pathname === '/' ) {
       document.write('Hello');
       document.close();
   }else{
-      GM.xmlHttpRequest({
+      console.log('location',location)
+      loader()
+  }
+  function loader(){
+          GM.xmlHttpRequest({
           method: "GET",
-          url: location,
+          url: location+'?'+Math.random(),
           onload: function(e) {
               var D       = window.document;
               var newDoc  = D.implementation.createHTMLDocument();
@@ -136,5 +140,10 @@ if (window.location.host == 'agar.io' && window.location.pathname === '/' ) {
               document.close();
   
           }
-      });
-  }  
+      })
+  }
+  
+  
+  
+  
+  

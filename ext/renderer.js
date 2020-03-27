@@ -316,7 +316,7 @@ var drawRender = {
             //this.drawViewport(this.ctx, 'Viewport #1', Connection.camMinX, Connection.camMinY, Connection.camMaxX, Connection.camMaxY, gameSetupTheme.bordersColor, 15);
             
             for(var Connection of application.c){
-
+            this.drawViewport(this.ctx, 'Protocol Viewport '+application.c.indexOf(Connection), Connection.viewportMinX, Connection.viewportMinY, Connection.viewportMaxX, Connection.viewportMaxY, '#FF00FF', 15);
             this.drawViewport(this.ctx, 'Client Viewport '+application.c.indexOf(Connection), Connection.protocol_viewX - Connection.viewportW2s, Connection.protocol_viewY - Connection.viewportH2s, Connection.protocol_viewX + Connection.viewportW2s, Connection.protocol_viewY + Connection.viewportH2s, theme.bordersColor, 15);
             //this.drawViewport(this.ctx, 'Client Viewport '+application.c.indexOf(Connection), Connection.viewMinX, Connection.viewMinY, Connection.viewMaxX, Connection.viewMaxY, theme.bordersColor, 15);
             this.drawRing(this.ctx, Connection.viewX, Connection.viewY, 15, 1, '#ff00ff') 

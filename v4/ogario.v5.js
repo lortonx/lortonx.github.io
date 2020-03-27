@@ -9957,7 +9957,7 @@ function loadUI(){
  $('#overlays-hud').append(`
  <div id="botClient" class="hud-text-center" style="/* text-align: center; *//* color: #fff; */ position: fixed; /* pointer-events: none; */font-size: 75%;/* white-space: nowrap; */padding: 0;top: 42%;display: block;/* width: 200px; */right: 10px;">
  <div style="margin: 6px;"> <span id="botCount" class="label hud-main-color pull-right" style="margin: 0.55em 0 0 0; padding: 0 0.55em 0 0;">Waiting</span></div>
- <b><!---div style="padding: 0 10px 6px;"> <span id="slots" class="label hud-main-color pull-right" style="margin: 0.55em 0 0 0;">Waiting</span></div--->
+ <b>
  </b></div>`);
 
 }

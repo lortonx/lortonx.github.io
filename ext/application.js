@@ -226,6 +226,11 @@ var profiles = {
             self.selectProfile(true,Number(n))
         })
 
+        $(document).on('change', '#clantag, #nick, #skin, #color',(event)=>{
+            event.preventDefault();
+            this.getValues(this.selectedA)
+            this.saveSettings()
+        })
 
     }
 }
@@ -255,8 +260,8 @@ window.master = {
     'getClientVersion': function() {
         var clientVersionString = window.localStorage.getItem('ogarioClientVersionString')
         if(clientVersionString !== null) {
-            this.clientVersionString = clientVersionString;
-            this.clientVersion = this.parseClientVersion(this.client_version_string);
+            this.client_version_string = clientVersionString;
+            this.client_version = this.parseClientVersion(this.client_version_string);
         }
         var self = this;
         $.ajax('//agar.io/mc/agario.js', {
@@ -280,8 +285,8 @@ window.master = {
         console.log('[ENV] Your client version:', this.client_version, this.client_version_string);
         if(this.client_version != number) {
             console.log('[ENV] Changing client version...');
-            this.clientVersion = number;
-            this.clientVersionString = string;
+            this.client_version = number;
+            this.client_version_string = string;
             if(window.application) {
                 window.application.setClientVersion(number, string);
             }
@@ -546,7 +551,7 @@ window.master = {
         this.setUI();
         this.getDefaultSettings()
         this.getRegionNames();
-
+        this.getClientVersion()
 
         //this.runFromHash();
         //this.getRegionCode();
@@ -855,7 +860,34 @@ const application = window.application = {
             }
             */
     },
+    fixAbsoluteOffset(current){
+        console.log('fixAbsoluteOffset')
+        var prX=-7071,prY=-7071,ofX=0,ofY=0,dontFix=true
+
+        current.mapShiftX=0
+        current.mapShiftY=0
+
+        diffX = prX-current.mapMinX+ofX
+        diffY = prY-current.mapMinY+ofY
+
+        current.mapShiftX=ofX-(diffX*1)
+        current.mapShiftY=ofY-(diffY*1)
+        current.shiftCells()
+
+
+        current.mapMinX=-7071
+        current.mapMinY=-7071
+        current.mapMaxX=7071
+        current.mapMaxY=7071
+        current.mapMidX = (current.mapMaxX + current.mapMinX) / 2;
+        current.mapMidY = (current.mapMaxY + current.mapMinY) / 2;
+        current.viewX =0
+        current.viewY=0
+        current.mapOffsetX =0
+        current.mapOffsetY=0
+    },
     fixOffset(Connection){
+        console.log('fixOffset')
         var prX=-7071,prY=-7071,ofX=0,ofY=0,dontFix=true
         for( var c of this.c){
             if(c.mapOffsetFixed){
@@ -879,6 +911,7 @@ const application = window.application = {
         Connection.mapShiftY=ofY-(diffY*1)
     },
     setupShift(){
+        console.log('setupShift')
         var prX=0,prY=0,ofX=0,ofY=0
         this.eachTabByPriority((current,previous,indexOfPriority,indexOfTab)=>{
             current.mapShiftX=0
@@ -1147,26 +1180,21 @@ const application = window.application = {
         });
 
         $(document).on(`click`, `#spectate`, () => {
-            comm.onSpectate()
-            profiles.getValues(profiles.selectedA)
-            profiles.saveSettings()
             this.sendSpectate()
             Settings.hideMenu()
-            profiles.saveSettings()
         });
 
         $(document).on(`click`, `#play`, () => {
-            profiles.getValues(profiles.selectedA)
-            profiles.saveSettings()
             Settings.hideMenu()
             this.doPlay();
-            profiles.saveSettings()
         });
 
 
         this.on('offset',(c)=>{
-            this.setupShift()
+            //this.setupShift()
             //app.fixOffset(c)
+
+            this.fixAbsoluteOffset(c)
         })
 
         this.on('death',(c)=>{
@@ -1297,6 +1325,7 @@ const application = window.application = {
             comm.onPlayerSpawn()
         })
         this.on('death',()=>{
+            localStorage.send = JSON.stringify({e:'env',key:'ai',value:true,_:Math.random()})
             if(app.play) return;
             comm.onPlayerDeath();
         })
@@ -1338,6 +1367,10 @@ const application = window.application = {
             positionClass: `toast-bottom-left`,
             timeOut: 15000
         };
+        $(document).on(`click`, `.btn-open-client`, () => {
+            window.open('https://agar.io/botclient?targetUrl='+this.ws+'&clientVersion='+master.client_version, "", "toolbar,scrollbars,resizable,top=500,left=500,width=400,height=400")
+        });
+        
     },
     getDefaultSettings() {
 
@@ -1499,6 +1532,7 @@ const application = window.application = {
     },
     connect(ws) {
         console.log('[Master] Connect to:', ws);
+        localStorage.send = JSON.stringify({e:'env',key:'targetUrl',value:ws,_:Math.random()})
         this.ws = ws;
         this.getWS(this.ws)
         this.tabCurrent = 0

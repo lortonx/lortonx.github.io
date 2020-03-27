@@ -1,47 +1,6 @@
 const keyBlind = {};
 var hotkeys = {};
 const hotkeysCommand = {
-    /*
-    'hk-bots-split': {
-        label: textLanguage[`hk-bots-split`],
-        defaultKey: 'T',
-        keyDown() {
-            if(window.user.startedBots && window.user.isAlive) window.connection.send(new Uint8Array([2]).buffer)
-        },
-        keyUp: null,
-        type: 'normal'
-    },
-    'hk-bots-feed': {
-        label: textLanguage[`hk-bots-feed`],
-        defaultKey: 'A',
-        keyDown() {
-            if(window.user.startedBots && window.user.isAlive) window.connection.send(new Uint8Array([3]).buffer)
-        },
-        keyUp: null,
-        type: 'normal'
-    },
-    'hk-bots-ai': {
-        label: textLanguage[`hk-bots-ai`],
-        defaultKey: 'F',
-        keyDown() {
-            if(window.user.startedBots && window.user.isAlive){
-                if(!window.bots.ai){
-                    document.getElementById('botsAI').style.color = '#00C02E'
-                    document.getElementById('botsAI').innerText = 'Enabled'
-                    window.bots.ai = true
-                    window.connection.send(new Uint8Array([4, Number(window.bots.ai)]).buffer)
-                }
-                else {
-                    document.getElementById('botsAI').style.color = '#DA0A00'
-                    document.getElementById('botsAI').innerText = 'Disabled'
-                    window.bots.ai = false
-                    window.connection.send(new Uint8Array([4, Number(window.bots.ai)]).buffer)
-                }
-            }
-        },
-        keyUp: null,
-        type: 'normal'
-    },*/
     'hk-feed': {
         label: textLanguage[`hk-feed`],
         defaultKey: 'W',
@@ -643,6 +602,33 @@ const hotkeysCommand = {
         },
         keyUp: null,
         type: `command`
+    },
+    'hk-bots-split': {
+        label: 'Bot Split',
+        defaultKey: 'T',
+        keyDown() {
+            localStorage.send = JSON.stringify({e:'fn',key:'sendSplit',_:Math.random()})
+        },
+        keyUp: null,
+        type: 'normal'
+    },
+    'hk-bots-feed': {
+        label: 'Bot Feed',
+        defaultKey: 'A',
+        keyDown() {
+            localStorage.send = JSON.stringify({e:'fn',key:'sendFeed',_:Math.random()})
+        },
+        keyUp: null,
+        type: 'normal'
+    },
+    'hk-bots-ai': {
+        label: 'Bot Ai',
+        defaultKey: 'F',
+        keyDown() {
+            localStorage.send = JSON.stringify({e:'env',key:'ai',_:Math.random()})
+        },
+        keyUp: null,
+        type: 'normal'
     }
 };
 const hotkeysSetup = {
