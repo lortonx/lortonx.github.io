@@ -524,6 +524,12 @@ Client.prototype = {
     mapMinY: -7071,
     mapMaxX: 7071,
     mapMaxY: 7071,
+
+    _mapMinX: -7071,
+    _mapMinY: -7071,
+    _mapMaxX: 7071,
+    _mapMaxY: 7071,
+
     mapShrinkW:1,
     mapShrinkH:1,
     mapMidX:0,
@@ -1359,13 +1365,13 @@ Client.prototype = {
                 this.countPps()
                 break;
             case 64:
-                this.viewMinX = /*this.flipX*/(message.readDoubleLE(offset));
+                this.viewMinX = message.readDoubleLE(offset);
                 offset += 8;
-                this.viewMinY = /*this.flipY*/(message.readDoubleLE(offset));
+                this.viewMinY = message.readDoubleLE(offset);
                 offset += 8;
-                this.viewMaxX = /*this.flipX*/(message.readDoubleLE(offset));
+                this.viewMaxX = message.readDoubleLE(offset);
                 offset += 8;
-                this.viewMaxY = /*this.flipY*/(message.readDoubleLE(offset));
+                this.viewMaxY = message.readDoubleLE(offset);
 
                 this.setMapOffset(this.viewMinX, this.viewMinY, this.viewMaxX, this.viewMaxY);
                 if((~~(this.viewMaxX - this.viewMinX)) === 14142 && (~~(this.viewMaxY - this.viewMinY)) === 14142){
@@ -1388,34 +1394,35 @@ Client.prototype = {
     shiftX(x,sh){return !sh?x-this.mapShiftX:x},
     shiftY(y,sh){return !sh?y-this.mapShiftY:y},
 
-    unflipX(x){return !this.mirrorH?x: this.mapMaxX - (x - this.mapMinX)},
-    unflipY(y){return !this.mirrorV?y: this.mapMaxY - (y - this.mapMinY)},
+
+    invflipX(x){return !!this.mirrorH?x: this.mapMaxX - (x - this.mapMinX)},
+    invflipY(y){return !!this.mirrorV?y: this.mapMaxY - (y - this.mapMinY)},
     flipX(x){return !this.mirrorH?x: this.mapMaxX - (x - this.mapMinX)},
     flipY(y){return !this.mirrorV?y: this.mapMaxY - (y - this.mapMinY)},
 
-    receiveX(x,sh){
-        const a = this.flipX(x)
-        const b = this.shiftX(a)
-        const c = this.shrinkX(b)
-        return c
+    receiveX(x){
+        x = this.shrinkX(x)
+        x = this.shiftX(x)
+        x = this.flipX(x)
+        return x
     },
-    receiveY(y,sh){
-        const a = this.flipY(y)
-        const b = this.shiftY(a)
-        const c = this.shrinkY(b)
-        return c
+    receiveY(y){
+        y = this.shrinkY(y)
+        y = this.shiftY(y)
+        y = this.flipY(y)
+        return y
     },
     serverX(x){
-        const c = this.unshrinkX(x)
-        const b = this.unshiftX(c)
-        const a = this.unflipX(b)
-        return a
+        x = this.flipX(x)
+        x = this.unshiftX(x)
+        x = this.unshrinkX(x)
+        return x
     },
     serverY(y){
-        const c = this.unshrinkY(y)
-        const b = this.unshiftY(c)
-        const a = this.unflipY(b)
-        return a
+        y = this.flipY(y)
+        y = this.unshiftY(y)
+        y = this.unshrinkY(y)
+        return y
     },
 
     setQuadrant(n){
@@ -1440,15 +1447,16 @@ Client.prototype = {
         }
 
         if(prevV!=this.mirrorV||prevH != this.mirrorH){
-            this.shiftCells()
+            this.shiftCells(prevV!=this.mirrorV,prevH != this.mirrorH)
         }
     },
-    shiftCells(){
+    shiftCells(H,V){
+
         for (var id in this.indexedCells){
-            this.indexedCells[id].x=this.receiveX(this.indexedCells[id].x)
-            this.indexedCells[id].y=this.receiveY(this.indexedCells[id].y)
-            this.indexedCells[id].targetX=this.receiveX(this.indexedCells[id].targetX)
-            this.indexedCells[id].targetY=this.receiveY(this.indexedCells[id].targetY)
+            !H&&(  this.indexedCells[id].targetX= this.mirrorH ? this.flipX(this.indexedCells[id].targetX) : this.invflipX(this.indexedCells[id].targetX)   )
+            !V&&(  this.indexedCells[id].targetY= this.mirrorV ? this.flipY(this.indexedCells[id].targetY) : this.invflipY(this.indexedCells[id].targetY)   )
+            !H&&(  this.indexedCells[id].x=       this.mirrorH ? this.flipX(this.indexedCells[id].x) : this.invflipX(this.indexedCells[id].x)   )
+            !V&&(  this.indexedCells[id].y=       this.mirrorV ? this.flipY(this.indexedCells[id].y) : this.invflipY(this.indexedCells[id].y)   )
         }
     },
     calcQuadrant(x, y) {
@@ -1513,42 +1521,17 @@ Client.prototype = {
     },
     setMapOffset(left, top, right, bottom) {
 
-        var getNewX = (xVlaue, oldWidth, newWidth)=>{
-            return  xVlaue * this.mapShrinkW
-            //return xVlaue * (newWidth / oldWidth);
-         }
-         var getNewY = (xVlaue, oldWidth, newWidth)=>{
-            return  xVlaue * this.mapShrinkH
-            //return xVlaue * (newWidth / oldWidth);
-         }
-                //this.viewMinX, this.viewMinY, this.viewMaxX, this.viewMaxY
-
         if ((right - left) > 14000 && (bottom - top) > 14000) {
-            
-            /*console.log('mapMinX',this.mapMinX == left)
-            console.log('mapMinY',this.mapMinY == top)
-            console.log('mapMaxX',this.mapMaxX == right)
-            console.log('mapMaxY',this.mapMaxY == bottom)*/
-
-            var side = 14142//7071*2
-            //14142.135623730952
+            var side = 14142.135623730952
 
             this.mapShrinkW = side / (right-left)
             this.mapShrinkH = side / (bottom-top)
 
-            left  = getNewX( left, (right-left), side)
-            top   = getNewY( top, (bottom-top), side)
-            right = getNewX( right, (right-left), side)
-            bottom =getNewY( bottom, (bottom-top), side)
+            left  = this.shrinkX( left, (right-left), side)
+            top   = this.shrinkY( top, (bottom-top), side)
+            right = this.shrinkX( right, (right-left), side)
+            bottom =this.shrinkY( bottom, (bottom-top), side)
 
-            console.table({
-                width:right-left,
-                height:bottom-top,
-                center:{x:(right-left)/2,y:(bottom-top)/2},
-                normal:{x:(right-left)/2,y:(bottom-top)/2}
-            })
-
-////////////////////////////////////////////////
             this.mapShiftY=0
             this.mapShiftX=0
             var prX=-((right-left)/2),
@@ -1562,10 +1545,15 @@ Client.prototype = {
             this.mapShiftX=ofX-diffX
             this.mapShiftY=ofY-diffY
 
-            left  = this.shiftX(this.flipX(left))
-            top   = this.shiftY(this.flipY(top))
-            right = this.shiftX(this.flipX(right))
-            bottom =this.shiftY(this.flipY(bottom))
+            //left  = this.flipX(left)
+            //top   = this.flipY(top)
+            //right = this.flipX(right)
+            //bottom =this.flipY(bottom)
+
+            left  = this.shiftX(left)
+            top   = this.shiftY(top)
+            right = this.shiftX(right)
+            bottom =this.shiftY(bottom)
 
 /////////////////////////////////////////////////
 
@@ -1588,10 +1576,10 @@ Client.prototype = {
             //application.emit('offset',this)
             console.log(`[Client ${application.c.indexOf(this)}] Map offset fixed (x, y):`, this.mapOffsetX, this.mapOffsetY);
         }else{
-            this.viewportMinX = left
-            this.viewportMinY = top
-            this.viewportMaxX = right
-            this.viewportMaxY = bottom
+            this.viewportMinX = this.receiveX(left)
+            this.viewportMinY = this.receiveY(top)
+            this.viewportMaxX = this.receiveX(right)
+            this.viewportMaxY = this.receiveY(bottom)
         }
         /*if ((right - left) > 14000 && (bottom - top) > 14000) {
 
