@@ -1069,7 +1069,7 @@ const application = window.application = {
         this.pause = !this.pause;
         tempsett.pause = this.pause;
         if (this.pause) {
-            //tempsett.resetTargetPosition();
+            for(var c of this.c) c.resetTargetPosition();
             $(`#pause-hud`).show();
         } else {
             $(`#pause-hud`).hide();
@@ -1182,11 +1182,13 @@ const application = window.application = {
         $(document).on(`click`, `#spectate`, () => {
             this.sendSpectate()
             Settings.hideMenu()
+            comm.onSpectate()
         });
 
         $(document).on(`click`, `#play`, () => {
             Settings.hideMenu()
             this.doPlay();
+            comm.onPlay()
         });
 
 
@@ -1329,9 +1331,9 @@ const application = window.application = {
             if(app.play) return;
             comm.onPlayerDeath();
         })
-        $(document).on(`click`, `#spectate`, () => {
+        /*$(document).on(`click`, `#spectate`, () => {
             comm.onSpectate()
-        });
+        });*/
         this.on('connecting',()=>{
             window.comm /*&& comm.onSpectate()*/ && comm.sendServerJoin() && comm.sendServerData()
             !window.comm && setTimeout(()=>{

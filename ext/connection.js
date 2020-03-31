@@ -323,6 +323,7 @@ function Cell(id, x, y, size, color, isFood, isVirus, isPlayer, shortMass, virus
 
         }
         regularpolygon(ctx,this.x, this.y, size, Math.max(size)*drawRender.scale )*/
+
         if (this.isFood) {
             ctx.fillStyle = this.color;
             ctx.fill();
@@ -523,6 +524,8 @@ Client.prototype = {
     mapMinY: -7071,
     mapMaxX: 7071,
     mapMaxY: 7071,
+    mapShrinkW:1,
+    mapShrinkH:1,
     mapMidX:0,
     mapMidY:0,
     
@@ -798,13 +801,21 @@ Client.prototype = {
             cursorY = this.targetY;
         }*/
         if(tempsett.pause){
-            cursorX = this.playerX;
-            cursorY = this.playerY;
+            cursorX = this.targetX//this.playerX;
+            cursorY = this.targetY//this.playerY;
         }
+
+        /* DRIVERS */
+        //cursorX = this.unshiftX( this.unflipX(cursorX))
+        //cursorY = this.unshiftY( this.unflipY(cursorY))
+        cursorX = this.serverX(cursorX)
+        cursorY = this.serverY(cursorY)
+        /* /DRIVERS */
+
         const view = this.createView(13);
         view.setUint8(0, 16);
-        view.setInt32(1, this.flipX( this.unshiftX(cursorX),true), true);
-        view.setInt32(5, this.flipY( this.unshiftY(cursorY),true), true);
+        view.setInt32(1, cursorX, true);
+        view.setInt32(5, cursorY, true);
         view.setUint32(9, this.protocolKey, true);
         this.sendMessage(view);
     },
@@ -988,11 +999,11 @@ Client.prototype = {
                 //https://github.com/issy123/agario-protocol/issues/21
                 break;
             case 17:
-                this.viewX = this.flipX(view.getFloat32(offset, true));
+                this.viewX = this.receiveX(view.getFloat32(offset, true));
                 this.protocol_viewX = this.viewX
                 //this.lviewX = this.viewX
                 offset += 4;
-                this.viewY = this.flipY(view.getFloat32(offset, true));
+                this.viewY = this.receiveY(view.getFloat32(offset, true));
                 this.protocol_viewY = this.viewY
                 //this.lviewY = this.viewY
                 offset += 4;
@@ -1090,22 +1101,22 @@ Client.prototype = {
 
                     var size = ~~Math.sqrt(100 * mass);
                     this.ghostCells.push({
-                        'x': this.flipX(x),
-                        'y': this.flipY(y),
+                        'x': this.receiveX(x),
+                        'y': this.receiveY(y),
                         'size': size,
                         'mass': mass,
-                        'inView': this.isInView(this.flipX(x), this.flipY(y), size/2)
+                        'inView': this.isInView(this.receiveX(x), this.receiveY(y), size/2)
                     });
                 }
-
+                //console.log(application.c.indexOf(this),new Date().getTime())
                 if(settings.mapLocalFix3 && this.ghostCellsStep==1 && this.ghostCells[0]) {
                     console.log('[DELTA] ghostfix')
-                    this.realQuadrant =  this.calcQuadrant(this.flipX(this.ghostCells[0].x), this.flipY(this.ghostCells[0].y))
+                    this.realQuadrant =  this.calcQuadrant(this.receiveX(this.ghostCells[0].x), this.receiveY(this.ghostCells[0].y))
                     this.setQuadrant(this.lastQuadrant)
                 }
                 if (this.ghostCells[0]){
                     this.quadrant = this.calcQuadrant(this.ghostCells[0].x, this.ghostCells[0].y)
-                    this.realQuadrant = this.calcQuadrant(this.flipX(this.ghostCells[0].x), this.flipY(this.ghostCells[0].y))
+                    this.realQuadrant = this.calcQuadrant(this.receiveX(this.ghostCells[0].x), this.receiveY(this.ghostCells[0].y))
                     this.lastQuadrant = this.quadrant
                 } else {
                     this.quadrant = 4;
@@ -1297,13 +1308,13 @@ Client.prototype = {
                     return text;
                 };
                 var message = new buffer.Buffer(view.buffer)
-                this.viewMinX = this.flipX(message.readDoubleLE(offset));
+                this.viewMinX = /*this.flipX*/(message.readDoubleLE(offset));
                 offset += 8;
-                this.viewMinY = this.flipY(message.readDoubleLE(offset));
+                this.viewMinY = /*this.flipY*/(message.readDoubleLE(offset));
                 offset += 8;
-                this.viewMaxX = this.flipX(message.readDoubleLE(offset));
+                this.viewMaxX = /*this.flipX*/(message.readDoubleLE(offset));
                 offset += 8;
-                this.viewMaxY = this.flipY(message.readDoubleLE(offset));
+                this.viewMaxY = /*this.flipY*/(message.readDoubleLE(offset));
                 offset += 8
                 offset += 4
                 if(encode2()) {
@@ -1367,21 +1378,46 @@ Client.prototype = {
                 break;
         }
     },
-    setOffset(){},
+    unshrinkX(x){return x / this.mapShrinkW},
+    unshrinkY(y){return y / this.mapShrinkH},
+    shrinkX(x){return x * this.mapShrinkW},
+    shrinkY(y){return y * this.mapShrinkH},
+
     unshiftX(x){return x-(-this.mapShiftX)},
     unshiftY(y){return y-(-this.mapShiftY)},
     shiftX(x,sh){return !sh?x-this.mapShiftX:x},
     shiftY(y,sh){return !sh?y-this.mapShiftY:y},
-    flipX(x,sh){
-        const a = !this.mirrorH?x: this.mapMaxX - (x - this.mapMinX)
-        const b = this.shiftX(a,sh)
-        return b
+
+    unflipX(x){return !this.mirrorH?x: this.mapMaxX - (x - this.mapMinX)},
+    unflipY(y){return !this.mirrorV?y: this.mapMaxY - (y - this.mapMinY)},
+    flipX(x){return !this.mirrorH?x: this.mapMaxX - (x - this.mapMinX)},
+    flipY(y){return !this.mirrorV?y: this.mapMaxY - (y - this.mapMinY)},
+
+    receiveX(x,sh){
+        const a = this.flipX(x)
+        const b = this.shiftX(a)
+        const c = this.shrinkX(b)
+        return c
     },
-    flipY(y,sh){
-        const a = !this.mirrorV?y: this.mapMaxY - (y - this.mapMinY)
-        const b = this.shiftY(a,sh)
-        return b
+    receiveY(y,sh){
+        const a = this.flipY(y)
+        const b = this.shiftY(a)
+        const c = this.shrinkY(b)
+        return c
     },
+    serverX(x){
+        const c = this.unshrinkX(x)
+        const b = this.unshiftX(c)
+        const a = this.unflipX(b)
+        return a
+    },
+    serverY(y){
+        const c = this.unshrinkY(y)
+        const b = this.unshiftY(c)
+        const a = this.unflipY(b)
+        return a
+    },
+
     setQuadrant(n){
         //if(this.gameMode == ':party') return false;
         var prevV = this.mirrorV, prevH = this.mirrorH
@@ -1409,10 +1445,10 @@ Client.prototype = {
     },
     shiftCells(){
         for (var id in this.indexedCells){
-            this.indexedCells[id].x=this.flipX(this.indexedCells[id].x)
-            this.indexedCells[id].y=this.flipY(this.indexedCells[id].y)
-            this.indexedCells[id].targetX=this.flipX(this.indexedCells[id].targetX)
-            this.indexedCells[id].targetY=this.flipY(this.indexedCells[id].targetY)
+            this.indexedCells[id].x=this.receiveX(this.indexedCells[id].x)
+            this.indexedCells[id].y=this.receiveY(this.indexedCells[id].y)
+            this.indexedCells[id].targetX=this.receiveX(this.indexedCells[id].targetX)
+            this.indexedCells[id].targetY=this.receiveY(this.indexedCells[id].targetY)
         }
     },
     calcQuadrant(x, y) {
@@ -1476,23 +1512,73 @@ Client.prototype = {
         this.viruses = [];
     },
     setMapOffset(left, top, right, bottom) {
+
+        var getNewX = (xVlaue, oldWidth, newWidth)=>{
+            return  xVlaue * this.mapShrinkW
+            //return xVlaue * (newWidth / oldWidth);
+         }
+         var getNewY = (xVlaue, oldWidth, newWidth)=>{
+            return  xVlaue * this.mapShrinkH
+            //return xVlaue * (newWidth / oldWidth);
+         }
                 //this.viewMinX, this.viewMinY, this.viewMaxX, this.viewMaxY
 
         if ((right - left) > 14000 && (bottom - top) > 14000) {
             
-            console.log('mapMinX',this.mapMinX == left)
+            /*console.log('mapMinX',this.mapMinX == left)
             console.log('mapMinY',this.mapMinY == top)
             console.log('mapMaxX',this.mapMaxX == right)
-            console.log('mapMaxY',this.mapMaxY == bottom)
+            console.log('mapMaxY',this.mapMaxY == bottom)*/
 
-            this.mapOffsetX = (this.mapOffset) - right;
-            this.mapOffsetY = (this.mapOffset) - bottom;
-            this.mapMinX = left//((-this.mapOffset) - this.mapOffsetX);
-            this.mapMinY = top//((-this.mapOffset) - this.mapOffsetY);
-            this.mapMaxX = right//((this.mapOffset) - this.mapOffsetX);
-            this.mapMaxY = bottom//((this.mapOffset) - this.mapOffsetY);
+            var side = 14142//7071*2
+            //14142.135623730952
+
+            this.mapShrinkW = side / (right-left)
+            this.mapShrinkH = side / (bottom-top)
+
+            left  = getNewX( left, (right-left), side)
+            top   = getNewY( top, (bottom-top), side)
+            right = getNewX( right, (right-left), side)
+            bottom =getNewY( bottom, (bottom-top), side)
+
+            console.table({
+                width:right-left,
+                height:bottom-top,
+                center:{x:(right-left)/2,y:(bottom-top)/2},
+                normal:{x:(right-left)/2,y:(bottom-top)/2}
+            })
+
+////////////////////////////////////////////////
+            this.mapShiftY=0
+            this.mapShiftX=0
+            var prX=-((right-left)/2),
+                prY=-((bottom-top)/2)
+                ofX=0,ofY=0
+
+    
+            let diffX = prX-left+ofX
+            let diffY = prY-top+ofY
+    
+            this.mapShiftX=ofX-diffX
+            this.mapShiftY=ofY-diffY
+
+            left  = this.shiftX(this.flipX(left))
+            top   = this.shiftY(this.flipY(top))
+            right = this.shiftX(this.flipX(right))
+            bottom =this.shiftY(this.flipY(bottom))
+
+/////////////////////////////////////////////////
+
+            this.mapOffsetX = ((right-left)/2) - right;
+            this.mapOffsetY = ((bottom-top)/2) - bottom;
+
+            this.mapMinX = left
+            this.mapMinY = top
+            this.mapMaxX = right
+            this.mapMaxY = bottom
             this.mapMidX = (this.mapMaxX + this.mapMinX) / 2;
             this.mapMidY = (this.mapMaxY + this.mapMinY) / 2;
+
             if (!this.mapOffsetFixed) {
                 this.viewX = (right + left) / 2;
                 this.viewY = (bottom + top) / 2;
@@ -1500,7 +1586,7 @@ Client.prototype = {
             }
             this.mapOffsetFixed = true;
             //application.emit('offset',this)
-            console.log(`[Client 1] Map offset fixed (x, y):`, this.mapOffsetX, this.mapOffsetY);
+            console.log(`[Client ${application.c.indexOf(this)}] Map offset fixed (x, y):`, this.mapOffsetX, this.mapOffsetY);
         }else{
             this.viewportMinX = left
             this.viewportMinY = top
@@ -1617,9 +1703,9 @@ Client.prototype = {
             if (id == 0) {
                 break;
             }
-            let x = this.flipX(view.readInt32LE(offset));
+            let x = this.receiveX(view.readInt32LE(offset));
             offset += 4;
-            let y = this.flipY(view.readInt32LE(offset));
+            let y = this.receiveY(view.readInt32LE(offset));
             offset += 4;
 
 
