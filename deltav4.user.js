@@ -6,7 +6,7 @@
 // @author       neo
 // @match        *://agar.io/*
 // @run-at       document-start
-// @connect      ogar.io
+// @connect      cdn.ogario.ovh
 // @connect      deltav4.glitch.me
 // @connect      hslo.io
 // @connect		 www.agartool.io
@@ -116,7 +116,8 @@ if (window.location.host == 'agar.io' && window.location.pathname === '/' ) {
   new Function(['GM'],localStorage['recovery'])(GM)
   
   document.documentElement.innerHTML = "Loading";
-  if(mode=='none'){
+  
+  if(location=='none'){
       document.open();
       document.write('Hello');
       document.close();
